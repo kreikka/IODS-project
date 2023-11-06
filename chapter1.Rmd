@@ -20,7 +20,7 @@ Maybe this is not going to be too difficult. The course materials seem to be ver
 ### 1.2. Getting familiar with R
 I had the tools already downloaded so I though the first week would be easy, but I actually hit the wall already with downloading packages (**tidyverse**) - somehow it just didn't work, but as usual, deleting and downloading the tools again helped. 
 
-The chapters 1-4 of the **R for Health Data Science (RHDS)** book together with Exercise set 1 gave a good start to using R! I have used Markdown before so the R Markdown feels quite intuitive. The RHDS book seems very helpful! I liked especially the chapter about different types of plots (chapter 4). I didn't have time to read the chapter about fine tuning the plots yet (chapter 5), but I'll get to it at week 2. 
+The chapters 1-4 of the **R for Health Data Science (RHDS)** book together with Exercise set 1 gave a good start to using R! I have used Markdown before so the R Markdown feels quite intuitive. The RHDS book seems very helpful! I liked especially the chapter about different types of plots (chapter 4). I didn't have time to read the chapter about fine tuning the plots yet (chapter 5), but I'll get to it at week 2. There were many technical steps in assignment 1 but with the good instructions they were easy to do and I'm ready for week 2!
 
 
 
