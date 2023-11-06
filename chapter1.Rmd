@@ -1,7 +1,27 @@
+<br>
 
-# About the project
+> My GitHub repository for the course: https://github.com/kreikka/IODS-project.git
 
-*Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you should use R Markdown syntax.*
+<br>
+
+# 1 First week
+
+<br>
+
+### 1.1. First Feelings 
+#### ...before the first class
+This is going to be my first course in a while since it's been a few years since my masters and I am just starting my PhD journey at the Doctoral Programme in Heath Sciences at UEF. My colleague told me about this course and even though I'm exited to learn more about statistics and R, I'm a bit worried if this is going to be too difficult.
+
+#### ...after the first class
+Maybe this is not going to be too difficult. The course materials seem to be very thorough and clear! I expect this course to give me basic knowledge on how to use R and where to learn more. Hopefully this course will give me confidence when starting my own analyse.
+
+***
+
+### 1.2. Getting familiar with R
+I had the tools already downloaded so I though the first week would be easy, but I actually hit the wall already with downloading packages (**tidyverse**) - somehow it just didn't work, but as usual, deleting and downloading the tools again helped. 
+
+The chapters 1-4 of the **R for Health Data Science (RHDS)** book together with Exercise set 1 gave a good start to using R! I have used Markdown before so the R Markdown feels quite intuitive. The RHDS book seems very helpful! I liked especially the chapter about different types of plots (chapter 4). I didn't have time to read the chapter about fine tuning the plots yet (chapter 5), but I'll get to it at week 2. 
+
 
 ```{r}
 # This is a so-called "R chunk" where you can write R code.
@@ -9,5 +29,5 @@
 date()
 
 ```
-The text continues here.
+
 
