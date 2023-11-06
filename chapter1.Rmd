@@ -4,7 +4,7 @@
 
 <br>
 
-# 1 First week
+# 1 First week - Getting started
 
 <br>
 
@@ -22,12 +22,5 @@ I had the tools already downloaded so I though the first week would be easy, but
 
 The chapters 1-4 of the **R for Health Data Science (RHDS)** book together with Exercise set 1 gave a good start to using R! I have used Markdown before so the R Markdown feels quite intuitive. The RHDS book seems very helpful! I liked especially the chapter about different types of plots (chapter 4). I didn't have time to read the chapter about fine tuning the plots yet (chapter 5), but I'll get to it at week 2. 
 
-
-```{r}
-# This is a so-called "R chunk" where you can write R code.
-
-date()
-
-```
 
 
