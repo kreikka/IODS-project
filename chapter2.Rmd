@@ -1,13 +1,167 @@
-# 2 Chapter 2 coming soon
+# 2 Assignment 2
 
-<!-- *Describe the work you have done this week and summarize your learning.*
+<br>
 
-- Describe your work and results clearly. 
-- Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.
-- Assume the reader has no previous knowledge of your data or the more advanced methods you are using.
+### 2.1. Data Wrangling
+After completing the Exercise set 2, I did the first part of the Assignment 2; Data wrangling. The first three steps were quite easy after the Exercise set, but setting the working directory by using write_csv() function was not so straightforward. I'm using a company computer and therefore I don't have a writing access to the folders by default. After a quick [google search](https://stackoverflow.com/questions/17779004/cannot-export-data-to-a-file-in-r-write-csv) I managed to overcome this with writing an absolute path to a file (see example below, not just the folder location). 
 
-```{r}
-date()
+<br>
+
+```
+# Setting the working directory to the IODS Project folder using write_csv() function. 
+write_csv(learning2014, file="C:\\...\\IODS\\IODS-project\\data\\learning2014.csv")
 ```
 
-Here we go again... -->
+### 2.2. Analysis; Reading and exploring the data
+
+Reading the data created in Data Wrangling part from a local folder:
+
+```{r, warning=FALSE, message=FALSE}
+
+# access all the libraries needed in the assignment 2:
+library(dplyr)
+library(tidyverse)
+library(GGally)
+library(ggplot2)
+
+
+# Reading a .csv file created in the Data wrangling:
+students2014 <- read_csv(file="C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\data\\learning2014.csv")
+```
+
+<br>
+
+Exploring the structure and dimensions of the data with **str()** and **dim()**. 
+There are 166 observations and 7 variables in the data. 
+
+Variables are:
+
+1. gender; M (Male) and F (Female)\
+2. Age; in years
+3. Attitude; Global attitude toward statistic
+4. deep; mean of the questions related to deep learning
+5. stra; mean of the questions related to strategic learning
+6. surf; mean of the questions related to surface learning
+7. Points; Examination points
+
+```{r, warning=FALSE, message=FALSE}
+#structure of the data
+str(students2014)
+
+#dimensions of the data
+dim(students2014)
+```
+
+<br> 
+
+### 2.3. Analysis; Graphical overview of the data
+
+Because there is only seven variables saved as columns in the data frame, I'll visualize all of the relationships in a single plots below using [**ggplot2**](http://ggplot2.org/) and **GGally** libraries. I found the [cheatsheet](https://rstudio.github.io/cheatsheets/html/data-visualization.html) for ggplot2 to be useful.
+
+
+```{r, warning=FALSE, message=FALSE}
+# draw a scatter plot matrix of the variables in students2014.
+# [-1] excludes the first column (gender)
+pairs(students2014[-1])
+
+# create a plot matrix with ggpairs()
+plot1 <- ggpairs(students2014, mapping = aes(), lower = list(combo = wrap("facethist", bins = 20))) + ggtitle ("The relationships of the variables")
+
+# draw the plot
+plot1
+
+```
+
+<br> 
+
+As seen above, the **Attitude** seems to correlate the most with the Examination points. Let's examine the correlation a bit further:
+
+```{r, warning=FALSE, message=FALSE}
+
+# initialize plot with data, aesthetic mapping, define the visualization type (points), add regression line and a title
+plot2 <- ggplot(students2014, aes(x = Attitude, y = Points)) + geom_point() + geom_smooth(method = "lm") + ggtitle ("Student's attitude versus Exam Points")
+
+# draw the plot
+plot2
+
+
+```
+
+<br> 
+
+The other two variables that correlate the most with the Examination points are **stra** and **surf**. Let's examine them too:
+
+```{r, warning=FALSE, message=FALSE}
+
+# initialize plot with data, aesthetic mapping, define the visualization type (points), add regression line and a title
+plot3 <- ggplot(students2014, aes(x = stra, y = Points)) + geom_point() + geom_smooth(method = "lm") + ggtitle ("Student's strategic learning versus Exam Points")
+plot4 <- ggplot(students2014, aes(x = surf, y = Points)) + geom_point() + geom_smooth(method = "lm") + ggtitle ("Student's surface learning versus Exam Points")
+
+# draw the plot
+plot3
+plot4
+
+
+```
+
+<br> 
+
+### 2.4. Analysis; Regression model
+
+The regression model below has three *explanatory variables*: **Attitude**, **stra** and **surf**. I chose the variables that had the highest absolute correlation with Examination **Points** (=*outcome variable*). 
+
+```{r,warning=FALSE, message=FALSE}
+
+# create a multiple regression model with explanatory variables: Attitude, stra and surf and outcome variable: Points
+mreg_model <- lm(Points ~ Attitude + stra + surf, data = students2014)
+
+# print out a summary of the model
+summary(mreg_model)
+
+```
+
+Looking at the results: It seeems that Attitude explains the Exam Points the most (statistically significant p-value), which is in line with the plots seen above (the regression line has the strongest angle compared to the ones in plots visualizing the correlation between points and stra/surf). In other words, in the Coefficients section, **stra** and **surf** are not considered to be significant by the model because their p-value is higher than 0.05. Keeping them does not provide any additional value to the model, so regression model using only Attitude would be best.
+
+<br>
+
+The R-Square of the model means the proportion of variance explained by the model, which is 0.21 = the model explains 21 % of the Examination Points. If we use only Attitude in the model (below), the R-Square is 0.19 (not much changed when **stra** and **surf** removed from the model), which means Attitude towards statistics explains 19 % of the Examination points. Further we can see that for every one **Point** increase, the value of **Attitude** increases 0.35.
+
+```{r,warning=FALSE, message=FALSE}
+
+# create a multiple regression model with explanatory variable Attitude and outcome variable Points
+reg_model <- lm(Points ~ Attitude, data = students2014)
+
+# print out a summary of the model
+summary(reg_model)
+
+```
+
+<br>
+
+Finally, let's produce a few diagnostic plots, first the multiple regression model:
+
+```{r,warning=FALSE, message=FALSE}
+
+# draw diagnostic plots using the plot() function. Choose the plots 1, 2 and 5
+par(mfrow = c(2,2))
+plot(mreg_model, which=c(1,2,5))
+
+```
+
+<br>
+
+... and then the regression model, using only **Attitude** as explanatory variable:
+
+```{r,warning=FALSE, message=FALSE}
+
+# draw diagnostic plots using the plot() function. Choose the plots 1, 2 and 5
+par(mfrow = c(2,2))
+plot(reg_model, which=c(1,2,5))
+
+```
+<br>
+
+As seen above, the plots are very much similar when using only linear regression versus multiple regression. It seems that the attitude matters the most in this dataset. Interesting! :) 
+
+<br>
+<br>
