@@ -380,6 +380,8 @@ to Open Data Science - Course Project</a></li>
 started</a></li>
 <li><a href="#assignment-2" id="toc-assignment-2">2 Assignment
 2</a></li>
+<li><a href="#assignment-3" id="toc-assignment-3">3 Assignment
+3</a></li>
 </ul>
 </div>
 
@@ -637,6 +639,67 @@ plot(reg_model, which=c(1,2,5))</code></pre>
 regression versus multiple regression. It seems that the attitude
 matters the most in this dataset. Interesting! :)</p>
 <p><br> <br></p>
+<hr />
+</div>
+</div>
+<div id="assignment-3" class="section level1">
+<h1>3 Assignment 3</h1>
+<p><br></p>
+<div id="data-wrangling-1" class="section level3">
+<h3>3.1. Data Wrangling</h3>
+<p>After completing the Exercise set 2, I did the first part of the
+Assignment 3; Data wrangling. The R script for that can be found
+here:</p>
+<p><br></p>
+</div>
+<div id="analysis-reading-and-exploring-the-data-1" class="section level3">
+<h3>3.2. Analysis; Reading and Exploring the data</h3>
+<p>Reading the data created in Data Wrangling part from a local
+folder:</p>
+<pre class="r"><code># access all the libraries needed in the assignment 3:
+library(dplyr)
+library(tidyverse)
+library(GGally)
+library(ggplot2)
+
+# Read the .csv file created in the Data wrangling:
+alc &lt;- read_csv(file=&quot;C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\data\\alc.csv&quot;)</code></pre>
+<p><br></p>
+<p>The data attributes include secondary education student grades
+(first, second and final grade; G1-G3), socio-demographic and education
+related features, and it was collected by using school reports and
+questionnaires. This data set <strong>alc</strong> combines two data in
+two distinct subjects; Mathematics (mat) and Portuguese language (por).
+More information about the open data sets used in this Assignment can be
+found <a href="http://www.archive.ics.uci.edu/dataset/320/student+performance">here</a>.
+In addition to the original variables this data has two additional
+alcohol-related variables: <strong>alc_use</strong> is the average of
+<strong>Dalc</strong> (Workday alcohol consumption) and
+<strong>Walc</strong> (weekend alcohol consumption) and
+<strong>high_use</strong> is TRUE if <strong>alc_use</strong> is higher
+than 2 and FALSE otherwise. The list of variables is shown below.</p>
+<p><br></p>
+<pre class="r"><code># Column names of the data set
+colnames(alc)</code></pre>
+<pre><code>##  [1] &quot;school&quot;     &quot;sex&quot;        &quot;age&quot;        &quot;address&quot;    &quot;famsize&quot;   
+##  [6] &quot;Pstatus&quot;    &quot;Medu&quot;       &quot;Fedu&quot;       &quot;Mjob&quot;       &quot;Fjob&quot;      
+## [11] &quot;reason&quot;     &quot;guardian&quot;   &quot;traveltime&quot; &quot;studytime&quot;  &quot;schoolsup&quot; 
+## [16] &quot;famsup&quot;     &quot;activities&quot; &quot;nursery&quot;    &quot;higher&quot;     &quot;internet&quot;  
+## [21] &quot;romantic&quot;   &quot;famrel&quot;     &quot;freetime&quot;   &quot;goout&quot;      &quot;Dalc&quot;      
+## [26] &quot;Walc&quot;       &quot;health&quot;     &quot;failures&quot;   &quot;paid&quot;       &quot;absences&quot;  
+## [31] &quot;G1&quot;         &quot;G2&quot;         &quot;G3&quot;         &quot;alc_use&quot;    &quot;high_use&quot;</code></pre>
+<p><br></p>
+</div>
+<div id="analysis-choosing-the-variables" class="section level3">
+<h3>3.3. Analysis; Choosing the variables</h3>
+<p><br></p>
+<blockquote>
+<p>Assignment: <em>Choose 4 interesting variables in the data and for
+each of them, present your personal hypothesis about their relationships
+with alcohol consumption.</em></p>
+</blockquote>
+<p><br></p>
+<p>There are many interesting variables to choose from</p>
 <hr />
 <p>(more chapters to be added similarly as we proceed with the
 course!)</p>

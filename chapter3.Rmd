@@ -1,0 +1,44 @@
+# 3 Assignment 3
+
+<br>
+
+### 3.1. Data Wrangling
+After completing the Exercise set 2, I did the first part of the Assignment 3; Data wrangling. The R script for that can be found here: 
+
+<br>
+
+### 3.2. Analysis; Reading and Exploring the data
+
+Reading the data created in Data Wrangling part from a local folder:
+
+```{r, warning=FALSE, message=FALSE}
+
+# access all the libraries needed in the assignment 3:
+library(dplyr)
+library(tidyverse)
+library(GGally)
+library(ggplot2)
+
+# Read the .csv file created in the Data wrangling:
+alc <- read_csv(file="C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\data\\alc.csv")
+```
+<br>
+
+The data attributes include Portuguese secondary education student grades (first, second and final grade; G1-G3), socio-demographic and education related features, and it was collected by using school reports and questionnaires. This data set **alc** combines two data in two distinct subjects; Mathematics (mat) and Portuguese language (por). More information about the open data sets used in this Assignment can be found [here](http://www.archive.ics.uci.edu/dataset/320/student+performance). In addition to the original variables this data has two additional alcohol-related variables: **alc_use** is the average of **Dalc** (Workday alcohol consumption) and **Walc** (weekend alcohol consumption) and **high_use** is TRUE if **alc_use** is higher than 2 and FALSE otherwise. The list of variables is shown below.
+
+<br>
+
+```{r, warning=FALSE, message=FALSE}
+# Column names of the data set
+colnames(alc)
+```
+<br>
+
+### 3.3. Analysis; Choosing the variables
+<br>
+
+> Assignment: *Choose 4 interesting variables in the data and for each of them, present your personal hypothesis about their relationships with alcohol consumption.*
+
+There are many interesting variables to choose from, but here I wanted to examine the possible effect of the family socioeconomic status (SES) and family relationships, so I chose the parents education (**Medu** = mothers education, **Fedu** = fathers education), home address type (**address** = urban or rural) and the quality of family relationships (**famrel**). My hypothesis is that higher education of the parents, living in urban area and having a good family relations might predict using less alcohol. Although alcohol use is a bit difficult to predict with different socioeconomic variables, since for example drinking wine with meals is usually more typical in middle-high and high-income families, when drinking beer and other similar beverages might be more common in low-income families, at least in some countries. Let's see what this data says about the relationship of family SES and relationships with students alcohol consumption.
+
+
