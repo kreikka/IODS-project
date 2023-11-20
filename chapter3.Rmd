@@ -181,7 +181,7 @@ round(prop.table(table4), 3)
 mehu <- ggplot(data = alc, aes(x = Medu_cat, fill = high_use)) + 
   geom_bar(position=position_dodge()) + 
   ggtitle("Mothers education and high alcohol consumption") +
-  xlab("Mothers education from no education (1) to highest education (4)") +
+  xlab("Mothers education from primary education or less (1) to highest education (4)") +
   scale_fill_brewer(palette="Dark2") +
   labs(fill="High Alcohol Use")
 mehu
@@ -190,7 +190,7 @@ mehu
 fehu <- ggplot(data = alc, aes(x = Fedu_cat, fill = high_use)) + 
   geom_bar(position=position_dodge()) + 
   ggtitle("Fathers education and high alcohol consumption") +
-  xlab("Fathers education from no education (1) to highest education (4)") +
+  xlab("Fathers education from primary education or less (1) to highest education (4)") +
   scale_fill_brewer(palette="Dark2") +
   labs(fill="High Alcohol Use") 
 fehu
@@ -231,6 +231,7 @@ The frequency tables, bar plots and summary statistics by group show that the hi
 ```{r, warning=FALSE, message=FALSE}
 # logistic regression model and summary of the model
 m <- glm(high_use ~ Medu_cat + Fedu_cat + address + famrel, data = alc, family = "binomial")
+# summary of the model
 summary(m) 
 
 # compute odds ratios (OR) and confidence intervals (CI) and print out
@@ -243,7 +244,7 @@ The Coefficients table shows that only quality of family relations (**famrel**) 
 
 <br>
 
-It's a bit boring to have only one variable explaining the high alcohol use in this model, but below I'm exploring the predictive power of the model. In my opinion, this model does not give much more information compared to the simple guessing from the previous bar plots and frequency tables. 
+It's a bit boring to have only one variable explaining the high alcohol use in this model, but below I'm exploring the predictive power of the model. In my opinion, this model does not give much more information compared to the simple guessing from the previous bar plots and frequency tables. If I would have had more time, I would have explored more variables and try to create a better model. 
 
 ```{r, warning=FALSE, message=FALSE}
 
@@ -251,10 +252,8 @@ m2 <- glm(high_use ~ famrel, data = alc, family = "binomial")
 # predict() the probability of high_use
 probabilities <- predict(m2, type = "response")
 
-# add the predicted probabilities to 'alc'
+# add the predicted probabilities to 'alc' and use the probabilities to make a prediction high_use
 alc <- mutate(alc, probability = probabilities)
-
-# use the probabilities to make a prediction of high_use
 alc <- mutate(alc, prediction = probability > 0.5)
 
 # tabulate the target variable versus the predictions
