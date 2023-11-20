@@ -7,7 +7,7 @@ After completing the Exercise set 2, I did the first part of the Assignment 3; D
 
 <br>
 
-### 3.2. Analysis; Reading and Exploring the data
+### 3.2. Reading and Exploring the data
 
 Reading the data created in Data Wrangling part from a local folder:
 
@@ -34,11 +34,240 @@ colnames(alc)
 ```
 <br>
 
-### 3.3. Analysis; Choosing the variables
+### 3.3. Choosing the variables
 <br>
 
 > Assignment: *Choose 4 interesting variables in the data and for each of them, present your personal hypothesis about their relationships with alcohol consumption.*
 
-There are many interesting variables to choose from, but here I wanted to examine the possible effect of the family socioeconomic status (SES) and family relationships, so I chose the parents education (**Medu** = mothers education, **Fedu** = fathers education), home address type (**address** = urban or rural) and the quality of family relationships (**famrel**). My hypothesis is that higher education of the parents, living in urban area and having a good family relations might predict using less alcohol. Although alcohol use is a bit difficult to predict with different socioeconomic variables, since for example drinking wine with meals is usually more typical in middle-high and high-income families, when drinking beer and other similar beverages might be more common in low-income families, at least in some countries. Let's see what this data says about the relationship of family SES and relationships with students alcohol consumption.
+There are many interesting variables to choose from, but here I wanted to examine the possible effect of the family socioeconomic status (SES) and family relationships on students alcohol consumption, so I chose the parents education (**Medu** = mothers education, **Fedu** = fathers education), home address type (**address** = urban or rural) and the quality of family relationships (**famrel**). Income would have been a nice addition, but that information was not collected. My hypothesis is that higher education of the parents, living in urban area and having a good family relations might predict using less alcohol. I'm interested to see if mothers and fathers education have differ on the effect they have on their childrens alcohol consumption. Although alcohol use is a bit difficult to predict with different socioeconomic variables, since for example drinking wine with meals is usually more typical in middle-high and high-income families, when drinking beer and other similar beverages might be more common in low-income families, at least in some countries. Let's see what this data has to say about the relationship of family SES and relationships with students alcohol consumption.
+
+<br>
+
+##### **Mothers and fathers education (Medu & Fedu):**
+
+<br>
+
+Let's explore the parents education:
 
 
+```{r, warning=FALSE, message=FALSE}
+
+# Mothers education
+me <- ggplot(data = alc, aes(x = Medu)) + 
+  geom_bar() + 
+  ggtitle("Mothers education") + 
+  xlab("Mothers education")
+me  
+# frequency table 
+table(alc$Medu)
+
+# Fathers education
+fe <- ggplot(data = alc, aes(x = Fedu)) + 
+  geom_bar() + 
+  ggtitle("Fathers education") + 
+  xlab("Fathers education")
+fe 
+# frequency table
+table(alc$Fedu)
+```
+
+<br>
+
+It seems that there are only 3 mothers and 2 fathers with no education (0 = no education). I decided to combine the "no education" to "primary education" (see below), so that the new variables are **Medu_cat** and **Fedu_cat** with the following data: 
+1 = primary education (4th grade) or less, 
+2 = 5th to 9th grade, 
+3 = secondary education and 
+4 = higher education.
+
+```{r, warning=FALSE, message=FALSE}
+# Recoding the no education category 0 into 1 for mothers education
+alc$Medu_cat <- recode(alc$Medu, '0' = 1)
+# checking the frequency table of the new variable compared to the origial
+table(alc$Medu)
+table(alc$Medu_cat)
+
+# Recoding the no education category 0 into 1 for fathers education
+alc$Fedu_cat <- recode(alc$Fedu, '0' = 1)
+# checking the frequency tables of the new variable compared to the origial
+table(alc$Fedu)
+table(alc$Fedu_cat)
+
+```
+<br>
+
+##### **Address:** \
+It seems that majority of the students lives in urban area.
+```{r, warning=FALSE, message=FALSE}
+# frequency table 
+table(alc$address)
+# Plot
+ad <- ggplot(data = alc, aes(x = address)) + 
+  geom_bar() + 
+  ggtitle("Students address") + 
+  xlab("R = Rural, U = Urban")
+ad  
+```
+
+
+Majority of the students recorded having very low alcohol consumption. The alcohol using histogram is skewed right, which is typical for this kind of variables. 
+
+<br>
+
+#### **Guality of family relationships:** \
+Majority of the students (about 75 %) have very good family relations (4 or 5 on a 1-5 scale), but also worse relations exists.
+
+```{r, warning=FALSE, message=FALSE}
+# frequency table 
+table(alc$famrel)
+# Plot
+fam <- ggplot(data = alc, aes(x = famrel)) + 
+  geom_bar() + 
+  ggtitle("Quality of family relationships") + 
+  xlab("quality of family relationships from 1 - very bad to 5 - excellent")
+fam  
+```
+<br>
+<br>
+
+#### **Alcohol consumption:** \
+Let's explore also the alcohol use (**alc_use**) and high consumption of alcohol (**high_use**) in this data:.
+```{r, warning=FALSE, message=FALSE}
+# frequency table 
+table(alc$alc_use)
+# Plot
+au <- ggplot(data = alc, aes(x = alc_use)) + 
+  geom_bar() + 
+  ggtitle("Alcohol use") + 
+  xlab("Alcohol use")
+au  
+
+# frequency table 
+table(alc$alc_use)
+# Plot
+hu <- ggplot(data = alc, aes(x = high_use)) + 
+  geom_bar() + 
+  ggtitle("High alcohol consumption") + 
+  xlab("High alcohol consumption")
+hu  
+
+```
+<br>
+<br>
+
+### 3.4. Relationship between the chosen variables and alcohol consumption
+
+<br>
+
+Next, I'll explore the relationships of **Medu_cat**, **Fedu_cat** (parents education categorised into 4), **address** (urban and rural) and **famrel** (scale from 1 - bad to 5 - excellent) to high alcohol consumption: **high_use**. 
+
+```{r, warning=FALSE, message=FALSE}
+# percentage frequency table; high_use and mothers education
+table1 <- table(alc$Medu_cat, alc$high_use)
+round(prop.table(table1), 3)
+# percentage frequency table; high_use and fathers education
+table2 <- table(alc$Fedu_cat, alc$high_use)
+round(prop.table(table2), 3)
+# percentage frequency table; high_use and address
+table3 <- table(alc$address, alc$high_use)
+round(prop.table(table3), 3)
+# percentage frequency table; high_use and famrel
+table4 <- table(alc$famrel, alc$high_use)
+round(prop.table(table4), 3)
+
+
+# Bar-plots:
+# high_use by mothers education
+
+mehu <- ggplot(data = alc, aes(x = Medu_cat, fill = high_use)) + 
+  geom_bar(position=position_dodge()) + 
+  ggtitle("Mothers education and high alcohol consumption") +
+  xlab("Mothers education from no education (1) to highest education (4)") +
+  scale_fill_brewer(palette="Dark2") +
+  labs(fill="High Alcohol Use")
+mehu
+
+# high_use by fathers education
+fehu <- ggplot(data = alc, aes(x = Fedu_cat, fill = high_use)) + 
+  geom_bar(position=position_dodge()) + 
+  ggtitle("Fathers education and high alcohol consumption") +
+  xlab("Fathers education from no education (1) to highest education (4)") +
+  scale_fill_brewer(palette="Dark2") +
+  labs(fill="High Alcohol Use") 
+fehu
+
+# high_use by address
+adhu <- ggplot(data = alc, aes(x = address, fill = high_use)) + 
+  geom_bar(position=position_dodge()) + 
+  ggtitle("Living area and high alcohol consumption") +
+  xlab("Rural (R) and Urban (U) living area") +
+  scale_fill_brewer(palette="Dark2") +
+  labs(fill="High Alcohol Use") 
+adhu
+
+# high_use by quality of family relations
+fahu <- ggplot(data = alc, aes(x = famrel, fill = high_use)) + 
+  geom_bar(position=position_dodge()) + 
+  ggtitle("Quality of family relations and high alcohol consumption") +
+  xlab("Quality of family relations from bad (1) to excellent (5)") +
+  scale_fill_brewer(palette="Dark2") +
+  labs(fill="High Alcohol Use") 
+fahu
+
+# Summary statistics by group
+alc %>% group_by(Medu_cat, high_use) %>% summarise(count = n())
+alc %>% group_by(Fedu_cat, high_use) %>% summarise(count = n())
+alc %>% group_by(address, high_use) %>% summarise(count = n())
+alc %>% group_by(famrel, high_use) %>% summarise(count = n())
+
+
+```
+The frequency tables, bar plots and summary statistics by group show that the high alcohol consumption is less probable in every category. This was expected since the about 70 % of the students does not have high alcohol consumption. It is interesting to see how large is the difference between high alcohol consumption and not high consumption. For example there is more difference looking at the mothers education compared to the fathers education. The hypothesis about having higher proportion of high alcohol users in rural area and poor family relations seemed to be correct. Looking at the bar plots it seems that parents education might not have statistically significant relation with high alcohol use. 
+
+<br>
+
+
+### 3.5. Logistic regression
+
+```{r, warning=FALSE, message=FALSE}
+# logistic regression model and summary of the model
+m <- glm(high_use ~ Medu_cat + Fedu_cat + address + famrel, data = alc, family = "binomial")
+summary(m) 
+
+# compute odds ratios (OR) and confidence intervals (CI) and print out
+OR <- coef(m) %>% exp
+CI <- confint(m) %>% exp()
+cbind(OR, CI)
+
+```
+The Coefficients table shows that only quality of family relations (**famrel**) is statistically significant (p<0.05). The coefficient estimate of the variable **famrel** is negative (b=-0.2817) meaning that on step increase in family relation quality decreases the probability of being high-user of alcohol to 0.72. The odds ratio (OR) for famrel is 0.754. The living area (**address**) correlates with the high use of alcohol, but it is not statistically significant (p=0.0695).
+
+<br>
+
+It's a bit boring to have only one variable explaining the high alcohol use in this model, but below I'm exploring the predictive power of the model. In my opinion, this model does not give much more information compared to the simple guessing from the previous bar plots and frequency tables. 
+
+```{r, warning=FALSE, message=FALSE}
+
+m2 <- glm(high_use ~ famrel, data = alc, family = "binomial")
+# predict() the probability of high_use
+probabilities <- predict(m2, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability = probabilities)
+
+# use the probabilities to make a prediction of high_use
+alc <- mutate(alc, prediction = probability > 0.5)
+
+# tabulate the target variable versus the predictions
+table(high_use = alc$high_use, prediction = alc$prediction)
+
+# define a loss function (mean prediction error)
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+
+# call loss_func to compute the average number of wrong predictions in the (training) data
+loss_func(class = alc$high_use, prob = alc$probability)
+
+
+```

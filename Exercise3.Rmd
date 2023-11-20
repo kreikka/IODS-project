@@ -762,7 +762,6 @@ loss_func <- function(class, prob) {
 
 # compute the average number of wrong predictions in the (training) data
 
-
 # K-fold cross-validation
 library(boot)
 cv <- cv.glm(data = alc, cost = loss_func, glmfit = m, K = nrow(alc))
