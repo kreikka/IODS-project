@@ -998,6 +998,10 @@ alcohol use.</p>
 </div>
 <div id="logistic-regression" class="section level3">
 <h3>3.5. Logistic regression</h3>
+<p>Let’s make a logistic regression with the values we have. The goal is
+to see whether variables predict binary value of high consumption of
+alcohol.</p>
+<p><br></p>
 <pre class="r"><code># logistic regression model and summary of the model
 m &lt;- glm(high_use ~ Medu_cat + Fedu_cat + address + famrel, data = alc, family = &quot;binomial&quot;)
 # summary of the model
@@ -1043,17 +1047,21 @@ cbind(OR, CI)</code></pre>
 coefficient estimate of the variable <strong>famrel</strong> is negative
 (b=-0.2817) meaning that on step increase in family relation quality
 decreases the probability of being high-user of alcohol to 0.72. The
-odds ratio (OR) for famrel is 0.754. The living area
-(<strong>address</strong>) correlates with the high use of alcohol, but
-it is not statistically significant (p=0.0695).</p>
+living area (<strong>address</strong>) correlates with the high use of
+alcohol, but it is not statistically significant (p=0.0695).<br />
+The odds ratio (OR) for famrel is 0.754, which means the odds for being
+in a high alcohol consumption group decreases as the family relations
+gets better (CI: 0.592-0.960). Other variables include 1 in their
+confidence interval, meaning there is no difference in parents education
+groups nor living area when trying to predict wheter student is a high
+alcohol consumer.</p>
 <p><br></p>
-<p>It’s a bit boring to have only one variable explaining the high
+<p>It’s a bit boring to have only one variable predicting the high
 alcohol use in this model, but below I’m exploring the predictive power
-of the model. In my opinion, this model does not give much more
-information compared to the simple guessing from the previous bar plots
-and frequency tables. If I would have had more time, I would have
-explored more variables and try to create a better model.</p>
-<pre class="r"><code>m2 &lt;- glm(high_use ~ famrel, data = alc, family = &quot;binomial&quot;)
+of the model, mainly to learn how it is done.</p>
+<pre class="r"><code># include the only significant variable
+m2 &lt;- glm(high_use ~ famrel, data = alc, family = &quot;binomial&quot;)
+
 # predict() the probability of high_use
 probabilities &lt;- predict(m2, type = &quot;response&quot;)
 
@@ -1061,12 +1069,26 @@ probabilities &lt;- predict(m2, type = &quot;response&quot;)
 alc &lt;- mutate(alc, probability = probabilities)
 alc &lt;- mutate(alc, prediction = probability &gt; 0.5)
 
-# tabulate the target variable versus the predictions
-table(high_use = alc$high_use, prediction = alc$prediction)</code></pre>
+# tabulate the target variable versus the predictions and probabilities
+print(table(high_use = alc$high_use, prediction = alc$prediction))</code></pre>
 <pre><code>##         prediction
 ## high_use FALSE
 ##    FALSE   259
 ##    TRUE    111</code></pre>
+<pre class="r"><code>print(table(high_use = alc$high_use, prediction = alc$prediction) %&gt;% prop.table() %&gt;% addmargins())</code></pre>
+<pre><code>##         prediction
+## high_use FALSE Sum
+##    FALSE   0.7 0.7
+##    TRUE    0.3 0.3
+##    Sum     1.0 1.0</code></pre>
+<p>As you would guess, this model does not give much more information
+compared to the simple guessing from the previous bar plots and
+frequency tables. The model predicts about one third wrong (111). If I
+would have had more time, I would have explored more variables and try
+to create a better model.</p>
+<p><br></p>
+<p>Finally, let’s calculate a loss function for the predictions and
+K-fold cross validation:</p>
 <pre class="r"><code># define a loss function (mean prediction error)
 loss_func &lt;- function(class, prob) {
   n_wrong &lt;- abs(class - prob) &gt; 0.5
@@ -1076,6 +1098,24 @@ loss_func &lt;- function(class, prob) {
 # call loss_func to compute the average number of wrong predictions in the (training) data
 loss_func(class = alc$high_use, prob = alc$probability)</code></pre>
 <pre><code>## [1] 0.3</code></pre>
+<pre class="r"><code># call loss_func to compute the average number of wrong predictions in the data when everyone is a high-user
+loss_func(class = alc$high_use, prob = 0)</code></pre>
+<pre><code>## [1] 0.3</code></pre>
+<pre class="r"><code>library(boot)
+# K-fold cross validation 
+cv &lt;- cv.glm(data = alc, cost = loss_func, glmfit = m2, K = nrow(alc))
+
+# average number of wrong predictions in the cross validation
+cv$delta[1]</code></pre>
+<pre><code>## [1] 0.3162162</code></pre>
+<p><br></p>
+<p>There is a 30 % chance of a student being wrongly classified as not
+being a high user in this model. The error rate 0.289 is not better than
+the model explored in the exercises and it is just barely better than
+just assuming everyone is a non-high user.</p>
+<pre class="r"><code># Document last knitted:
+date()</code></pre>
+<pre><code>## [1] &quot;Tue Nov 21 08:01:23 2023&quot;</code></pre>
 <hr />
 <p>(more chapters to be added similarly as we proceed with the
 course!)</p>

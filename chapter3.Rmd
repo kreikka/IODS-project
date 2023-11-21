@@ -228,6 +228,10 @@ The frequency tables, bar plots and summary statistics by group show that the hi
 
 ### 3.5. Logistic regression
 
+Let's make a logistic regression with the values we have. The goal is to see whether variables predict binary value of high consumption of alcohol.
+
+<br> 
+
 ```{r, warning=FALSE, message=FALSE}
 # logistic regression model and summary of the model
 m <- glm(high_use ~ Medu_cat + Fedu_cat + address + famrel, data = alc, family = "binomial")
@@ -240,15 +244,17 @@ CI <- confint(m) %>% exp()
 cbind(OR, CI)
 
 ```
-The Coefficients table shows that only quality of family relations (**famrel**) is statistically significant (p<0.05). The coefficient estimate of the variable **famrel** is negative (b=-0.2817) meaning that on step increase in family relation quality decreases the probability of being high-user of alcohol to 0.72. The odds ratio (OR) for famrel is 0.754. The living area (**address**) correlates with the high use of alcohol, but it is not statistically significant (p=0.0695).
+The Coefficients table shows that only quality of family relations (**famrel**) is statistically significant (p<0.05). The coefficient estimate of the variable **famrel** is negative (b=-0.2817) meaning that on step increase in family relation quality decreases the probability of being high-user of alcohol to 0.72. The living area (**address**) correlates with the high use of alcohol, but it is not statistically significant (p=0.0695). \
+The odds ratio (OR) for famrel is 0.754, which means the odds for being in a high alcohol consumption group decreases as the family relations gets better (CI: 0.592-0.960). Other variables include 1 in their confidence interval, meaning there is no difference in parents education groups nor living area when trying to predict wheter student is a high alcohol consumer. 
 
 <br>
 
-It's a bit boring to have only one variable explaining the high alcohol use in this model, but below I'm exploring the predictive power of the model. In my opinion, this model does not give much more information compared to the simple guessing from the previous bar plots and frequency tables. If I would have had more time, I would have explored more variables and try to create a better model. 
+It's a bit boring to have only one variable predicting the high alcohol use in this model, but below I'm exploring the predictive power of the model, mainly to learn how it is done.  
 
 ```{r, warning=FALSE, message=FALSE}
-
+# include the only significant variable
 m2 <- glm(high_use ~ famrel, data = alc, family = "binomial")
+
 # predict() the probability of high_use
 probabilities <- predict(m2, type = "response")
 
@@ -256,9 +262,18 @@ probabilities <- predict(m2, type = "response")
 alc <- mutate(alc, probability = probabilities)
 alc <- mutate(alc, prediction = probability > 0.5)
 
-# tabulate the target variable versus the predictions
-table(high_use = alc$high_use, prediction = alc$prediction)
+# tabulate the target variable versus the predictions and probabilities
+print(table(high_use = alc$high_use, prediction = alc$prediction))
+print(table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table() %>% addmargins())
+```
 
+As you would guess, this model does not give much more information compared to the simple guessing from the previous bar plots and frequency tables. The model predicts about one third wrong (111). If I would have had more time, I would have explored more variables and try to create a better model. 
+
+<br>
+
+Finally, let's calculate a loss function for the predictions and K-fold cross validation:
+
+```{r, warning=FALSE, message=FALSE}
 # define a loss function (mean prediction error)
 loss_func <- function(class, prob) {
   n_wrong <- abs(class - prob) > 0.5
@@ -268,5 +283,22 @@ loss_func <- function(class, prob) {
 # call loss_func to compute the average number of wrong predictions in the (training) data
 loss_func(class = alc$high_use, prob = alc$probability)
 
+# call loss_func to compute the average number of wrong predictions in the data when everyone is a high-user
+loss_func(class = alc$high_use, prob = 0)
 
+library(boot)
+# K-fold cross validation 
+cv <- cv.glm(data = alc, cost = loss_func, glmfit = m2, K = nrow(alc))
+
+# average number of wrong predictions in the cross validation
+cv$delta[1]
+```
+<br>
+
+There is a 30 % chance of a student being wrongly classified as not being a high user in this model. The error rate 0.289 is not better than the model explored in the exercises and it is just barely better than just assuming everyone is a non-high user.
+
+
+```{r, warning=FALSE, message=FALSE}
+# Document last knitted:
+date()
 ```
