@@ -1096,6 +1096,7 @@ loss_func &lt;- function(class, prob) {
 }
 
 # call loss_func to compute the average number of wrong predictions in the (training) data
+# note: in the RStudio editor, this outputs [1] 0.2891892 - I didn&#39;t have time to find out why it is rounded to 0.3 when knitted
 loss_func(class = alc$high_use, prob = alc$probability)</code></pre>
 <pre><code>## [1] 0.3</code></pre>
 <pre class="r"><code># call loss_func to compute the average number of wrong predictions in the data when everyone is a high-user
@@ -1115,7 +1116,7 @@ the model explored in the exercises and it is just barely better than
 just assuming everyone is a non-high user.</p>
 <pre class="r"><code># Document last knitted:
 date()</code></pre>
-<pre><code>## [1] &quot;Tue Nov 21 08:01:23 2023&quot;</code></pre>
+<pre><code>## [1] &quot;Tue Nov 21 08:08:13 2023&quot;</code></pre>
 <hr />
 <p>(more chapters to be added similarly as we proceed with the
 course!)</p>

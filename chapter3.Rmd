@@ -281,6 +281,7 @@ loss_func <- function(class, prob) {
 }
 
 # call loss_func to compute the average number of wrong predictions in the (training) data
+# note: in the RStudio editor, this outputs [1] 0.2891892 - I didn't have time to find out why it is rounded to 0.3 when knitted
 loss_func(class = alc$high_use, prob = alc$probability)
 
 # call loss_func to compute the average number of wrong predictions in the data when everyone is a high-user
