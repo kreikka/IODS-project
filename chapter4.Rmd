@@ -188,7 +188,7 @@ table(correct = correct_classes, predicted = lda.pred$class)
 
 ```
 <br>
-There are total of $18+16+13+28=75$ correct predictions, which is $73 %$ of the 102 observations. Compared to the accuracy of 25 % without our model, the 73 % is quite good. The **high** class gets predicted correct at almost all cases (28/30). It seems that the model is not that good predicting low and med_low classes. 
+There are total of $18+16+13+28=75$ correct predictions, which is 73 % of the 102 observations. Compared to the accuracy of 25 % without our model, the 73 % is quite good. The **high** class gets predicted correct at almost all cases (28/30). It seems that the model is not that good predicting low and med_low classes. 
 
 <br>
 
@@ -234,7 +234,10 @@ It can be seen from the visualizations, that the clusters overlap quite a lot.
 
 <br>
 
-Next I'll investigate the appropriate number of clusters:
+
+K-means needs the number of clusters as an argument and next I'll investigate that. I'll determine the number of clusters by looking at how the total of within cluster sum of squares (WCSS) behaves when the number of cluster changes. When plotting the number of clusters and the total WCSS, the optimal number of clusters is when the total WCSS drops radically.
+
+I'll use the function `set.seed()` to deal with possibly different results every time.
 
 
 ```{r, warning=FALSE, message=FALSE}
@@ -250,7 +253,9 @@ twcss <- sapply(1:k_max, function(k){kmeans(boston_scaled2, k)$tot.withinss})
 qplot(x = 1:k_max, y = twcss, geom = 'line')
 
 ```
-The line always declines with the count of clusters and the idea is to identify where is a appropriate number of clusters (where is the breaking point of the most added value from an additional cluster). It seems that the line starts to level off at around two, and after that the line continues roughly on the same angle. I decided to use two clusters (decided between two and three) and fit the model again. We can see that it is much easier to distinguish the two clusters from each other. 
+<br>
+
+The line always declines with the count of clusters and the idea is to identify where is a appropriate number of clusters (where is the breaking point of the most added value from an additional cluster). It seems that the line starts to level off at around two, and after that the line continues roughly on the same angle. Therefore I decided on using two clusters and fit the model again. Below we can see that it is much easier to distinguish the two clusters from each other. 
 
 ```{r, warning=FALSE, message=FALSE}
 set.seed(123)
@@ -264,6 +269,13 @@ pairs(boston_scaled2[1:7], col = km$cluster)
 pairs(boston_scaled2[8:14], col = km$cluster)
 
 ```
+
+<br> 
+
+### 4.6. Data Wrangling
+Data wrangling for the next week can be found [here.](https://github.com/kreikka/IODS-project/blob/master/data/create_human.R)
+
+<br> 
 
 ```{r, warning=FALSE, message=FALSE}
 # Document last knitted:

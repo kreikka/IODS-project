@@ -3,7 +3,7 @@
 <br>
 
 ### 3.1. Data Wrangling
-After completing the Exercise set 2, I did the first part of the Assignment 3; Data wrangling. The R script for that can be found here: 
+After completing the Exercise set 2, I did the first part of the Assignment 3; Data wrangling. The R script for that can be found [here](https://github.com/kreikka/IODS-project/blob/master/data/create_alc.R)
 
 <br>
 
