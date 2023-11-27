@@ -1,4 +1,4 @@
-# 3 Assignment 3
+# 3 Logistic regression
 
 <br>
 
@@ -299,7 +299,4 @@ cv$delta[1]
 There is a 30 % chance of a student being wrongly classified as not being a high user in this model. The error rate 0.289 is not better than the model explored in the exercises and it is just barely better than just assuming everyone is a non-high user.
 
 
-```{r, warning=FALSE, message=FALSE}
-# Document last knitted:
-date()
-```
+
