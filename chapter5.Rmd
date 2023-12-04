@@ -25,7 +25,6 @@ Below I'll load the data and define Country as row names:
 ```{r, warning=FALSE, message=FALSE}
 # access the libraries needed for the Assignment 5
 
-install.packages(c("factoextra"))
 
 library(dplyr)
 library(readr)
@@ -35,6 +34,7 @@ library(ggplot2)
 library(GGally)
 library(FactoMineR)
 library(factoextra)
+library(tidyverse)
 
 # load the data created in the Data wrangling:
 human <- read_csv(file="C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\data\\human.csv")
@@ -193,7 +193,7 @@ Next I'll conduct the multiple correspondence analysis (MCA) and use 'fviz_mca_b
 ```{r, warning=FALSE, message=FALSE}
 # Selecting the variables 
 keep_columns <- c("Tea", "How", "sugar", "how", "where", "breakfast", "evening", "lunch", "dinner")
-tea_sel <- select(tea, one_of(keep_columns))
+tea_sel <- dplyr::select(tea, one_of(keep_columns))
 
 # multiple correspondence analysis (MCA)
 library(FactoMineR)
