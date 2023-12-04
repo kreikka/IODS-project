@@ -277,7 +277,3 @@ Data wrangling for the next week can be found [here.](https://github.com/kreikka
 
 <br> 
 
-```{r, warning=FALSE, message=FALSE}
-# Document last knitted:
-date()
-```

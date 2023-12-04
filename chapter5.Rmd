@@ -1,0 +1,213 @@
+# 5 Dimensionality reduction techniques
+
+<br>
+
+### 5.1. Data Wrangling and Exploring the data
+
+The Data wrangling part with exploring the data can be found [here](https://github.com/kreikka/IODS-project/blob/master/data/create_human.R). This week's data consists of Human Development Index (HDI) and gender inequality (GII) related variables by country. The joined and edited data includes 155 observations and the following variables: 
+
+Variable      meaning       
+----------    ----------
+Country       Country name
+Edu2.FM       Ratio of female and male populations with at least secondary education
+Labo.FM       Ratio of female and male labor force participation (an estimate of an economy's active workforce)
+Edu.Exp       Expected years of education
+Life.Exp      Life expectancy at birth
+GNI           Gross National Income (GNI) per Capita
+Mat.Mor       Maternal mortality ratio
+Ado.Birth     Adolescent birth rate
+Parli.F       Female Representation in Parliament, percentage
+
+<br>
+
+Below I'll load the data and define Country as row names:
+
+```{r, warning=FALSE, message=FALSE}
+# access the libraries needed for the Assignment 5
+
+install.packages(c("factoextra"))
+
+library(dplyr)
+library(readr)
+library(corrplot)
+library(tibble)
+library(ggplot2)
+library(GGally)
+library(FactoMineR)
+library(factoextra)
+
+# load the data created in the Data wrangling:
+human <- read_csv(file="C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\data\\human.csv")
+
+# Structure of the Data:
+str(human)
+
+# The first column is Country, and here I'll define the Country names to be the row names:
+human <- column_to_rownames(human, "Country")
+
+# Structure of the modified data:
+str(human)
+# Now there is 8 variables instead of nine
+
+```
+<br>
+
+Next I'll examine the data graphically. 
+
+```{r, warning=FALSE, message=FALSE}
+# summaries of the variables in the data
+summary(human)
+
+# graphical overview with ggpairs
+ggpairs(human, progress = FALSE, lower = list(continuous = wrap("points", alpha = 0.3, size=0.2), combo = wrap("dot", alpha = 0.4, size=0.2))) +
+          theme(axis.text=element_text(size=6))
+
+# compute the correlation matrix and visualize it with corrplot
+cor_matrix <- cor(human)
+corrplot(cor_matrix, method="square", order = "AOE", tl.srt = 45, col = COL2("PRGn", 10), diag = FALSE)
+
+```
+<br>
+
+We can see that the distributions of the variables vary a lot. The expected years of education (**Edu.Exp**) is the only variable that looks somewhat normally distributed. The distribution of **GNI**, maternal mortality (**Mat.Mor**), adolescent birth rate (**Ado.Birth**) and the percentage of female representatives in parliament (**Parli.F**) are skewed right, meaning low (and medium) values of observations in most of the Countries. For example the maternal mortality rate in most countries is quite low, but higher rates are still prevalent in some of the countries. On the contrary, the distributions of life expectancy (**Life.Exp**), the ratio of female/male labour force participation rate (**Labo.FM**) and the ratio of female/male population with at least secondary education (**Edu2.FM**) are skewed to the left. 
+
+<br>
+The correlations seem intuitive; both maternal mortality and adolescent birth rate correlates negatively with life expectancy, the ratio of female/male population with at least secondary education and expected years of education. They also have a negative correlation with GNI. Maternal mortality rate and adolescent birth rate correlate positively with each other; in countries with less adolescent births, there is also less maternal mortality. Life expectancy correlates positively with expected years of education, GNI and the ratio of female/male secondary school; Countries with higher GNI, more education and equal education between females and males have higher life expectancy. The ratio of females/males participating in labour force seems not to have much correlation with the other variables.
+
+<br>
+
+### 5.2. Principal component analysis (PCA)
+
+The principal component analysis (PCA) on the 'human' -data is done below:
+
+```{r, warning=FALSE, message=FALSE}
+# Principal component analysis (PCA) with the SVD method
+pca_human <- prcomp(human)
+
+# a biplot of the principal component representation and the original variables
+biplot(pca_human, choices = 1:2, cex = 0.8, col = c("green3", "black"))
+
+```
+<br>
+
+The x-axis displays the first principal component (PC1) and the y-axis the second principal component (PC2). The observations are shown in the plot in green with the 8 variables shown in black. As we can see, the plot above is hard to read. It seems that GNI has the strongest effect in PC1. Qatar is clearly different from other countries, but otherwise the plot is difficult to interpret. Therefore, it is a good idea to try the PCA again with scaled data. 
+
+
+```{r, warning=FALSE, message=FALSE}
+# standardizing the variables
+human_std <- scale(human)
+
+# perform principal component analysis (with the SVD method) on the standardized data
+pca_human_std <- prcomp(human_std)
+
+# a biplot of the principal component representation 
+biplot(pca_human_std, choices = 1:2, cex = c(0.6, 0.8), col = c("green3", "black"), 
+       main = "PCA results on standardized data", 
+       xlab = "First component (PC1)", 
+       ylab = "Second component (PC2)") 
+
+```
+
+<br>
+The new biplot is easier to interpret and the overall variability shows a lot better on a standardized than on a raw data. The extreme value of GNI in Qatar does not have as strong impact on the PC1 in the scaled data. Below is the same plot scaled, so that the country names and clustering can be seen better: 
+![a biplot of the principal component representation](C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\biplot.jpg)
+
+<br>
+
+The ratio of female/male labour force participation rate (**Labo.FM**) and the percentage of female representatives in parliament (**Parli.F**) seems to have an impact on PC2 and other variables have more impact on PC1, which is in line with previous correlation exploring (**Parli.F** and **Labo.FM** did not have as much correlation with the other variables). The higher the Maternal mortality (**Mat.Mor**) and adolescent birth rate (**Ado.Birth**), the higher the PC1 value. Again, it is also intuitive, that same countries having higher rates of adolescent births are having problems with maternal mortality rate. For example Sierra Leone, Chad and Congo seem to have high rates of both maternal mortality and adolescent births, as well as low life expectancy (years) and expected years of education. The arrow length of all variables is relatively same. The more developed countries, such as Nordic countries can be found in upper left corner in the figure; Iceland, Sweden, Norway, Finland and Denmark have low adolescent birth rate and maternal mortality due to good health care. At the same time, Nordic countries tend to have good education and relatively equal possibilities for females and males to educate themselves and being employed.
+
+<br>
+
+### 5.3. Multiple Correspondence Analysis (MCA)
+
+For this Exercise I'm going to use 'tea' data that comes from 'FactorMineR' package. The data includes 300 observations and 36 variables on how, why and where the individuals drink tea. First I'll load and explore the data:
+
+```{r, warning=FALSE, message=FALSE}
+# Reading the data and converting the character variables to factors:
+tea <- read.csv("https://raw.githubusercontent.com/KimmoVehkalahti/Helsinki-Open-Data-Science/master/datasets/tea.csv", stringsAsFactors = TRUE)
+
+# viewing the data and exploring the structure and dimensions
+# View(tea)
+str(tea)
+dim(tea)
+summary(tea)
+
+
+# Plots on the age distribution of the population and general information about what tea and how they drink their tea:
+
+p1 <- ggplot(data = tea, aes(x = age, fill = age)) + 
+  geom_bar() + 
+  ggtitle("Age distribution of the population") 
+
+p2 <- ggplot(data = tea, aes(x = frequency, fill = frequency)) + 
+  geom_bar() + 
+  ggtitle("Frequency of drinking tea") 
+
+p3 <- ggplot(data = tea, aes(x = Tea, fill = Tea)) + 
+  geom_bar() + 
+  ggtitle("Tea types") 
+
+p4 <- ggplot(data = tea, aes(x = how, fill = how)) + 
+  geom_bar() + 
+  ggtitle("Using unpackaged tea or tea bags") 
+
+p5 <- ggplot(data = tea, aes(x = sugar, fill = sugar)) + 
+  geom_bar() + 
+  ggtitle("Using sugar in tea") 
+
+p6 <- ggplot(data = tea, aes(x = How, fill = How)) + 
+  geom_bar() + 
+  ggtitle("Using milk, lemon or other additions with tea") 
+
+p7 <- ggplot(data = tea, aes(x = where, fill = where)) + 
+  geom_bar() + 
+  ggtitle("Typical place to buy tea") 
+
+p1
+p2
+p3
+p4
+p5
+p6
+p7
+
+
+# Visualizing the other factors answering the questions about "how" the population usually drinks tea
+tea2 <- tea[,1:12]
+
+pivot_longer(tea2, cols = everything()) %>% 
+  ggplot(aes(value)) + 
+  geom_bar() + 
+  facet_wrap("name", scales = "free") +
+  theme(axis.text.x = element_text(angle = 10))
+
+```
+<br>
+
+The 'tea' data includes population that drinks tea quite often: Usually once or more per day, Earl Grey being the most popular choice of tea. Usually tea is bought from chain store and it is prepared with tea bag. Using sugar divides the group in half and using milk and lemon is less usual. Tea is usually drank home, breakfast being the most common meal to have tea with. 
+
+<br>
+
+Next I'll conduct the multiple correspondence analysis (MCA) and use 'fviz_mca_biplot()' to draw the biplot of individuals and categories:
+
+```{r, warning=FALSE, message=FALSE}
+# Selecting the variables 
+keep_columns <- c("Tea", "How", "sugar", "how", "where", "breakfast", "evening", "lunch", "dinner")
+tea_sel <- select(tea, one_of(keep_columns))
+
+# multiple correspondence analysis (MCA)
+library(FactoMineR)
+mca <- MCA(tea_sel, graph = TRUE)
+
+# MCA biplot of individuals and variable categories
+fviz_mca_biplot(mca, 
+                ggtheme = theme_minimal())
+
+```
+<br>
+It can be seen that the tea shopping place (**where**) and using tea bag or unpacked tea (**how**) are separated from the other variables and are furthest away from the origin (whre x- and y-axis meet). Further we can see from the biplot of individuals and variable categories that unpacked tea and buying tea from a tea shop are next to each other, which is understandable. Similarly, the mixed options of **chain store + shop** and **tea bag + unpacked** are next to each other.
+
+```{r, warning=FALSE, message=FALSE}
+# Document last knitted:
+date()
+```
