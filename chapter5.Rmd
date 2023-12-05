@@ -87,10 +87,14 @@ pca_human <- prcomp(human)
 # a biplot of the principal component representation and the original variables
 biplot(pca_human, choices = 1:2, cex = 0.8, col = c("green3", "black"))
 
+#print summary
+summary(pca_human)
+
 ```
 <br>
 
-The x-axis displays the first principal component (PC1) and the y-axis the second principal component (PC2). The observations are shown in the plot in green with the 8 variables shown in black. As we can see, the plot above is hard to read. It seems that GNI has the strongest effect in PC1. Qatar is clearly different from other countries, but otherwise the plot is difficult to interpret. Therefore, it is a good idea to try the PCA again with scaled data. 
+The x-axis displays the first principal component (PC1) and the y-axis the second principal component (PC2). The observations are shown in the plot in green with the 8 variables shown in black. From the summary table we can observe that the PC1 captures almost all the variance while other components have almost no variance. It seems that GNI has the strongest effect in PC1. Qatar is clearly different from other countries, but otherwise the plot is difficult to interpret and the results are quite meaningless.  
+Therefore, it is a good idea to try the PCA again with scaled data. 
 
 
 ```{r, warning=FALSE, message=FALSE}
@@ -100,21 +104,35 @@ human_std <- scale(human)
 # perform principal component analysis (with the SVD method) on the standardized data
 pca_human_std <- prcomp(human_std)
 
+
 # a biplot of the principal component representation 
 biplot(pca_human_std, choices = 1:2, cex = c(0.6, 0.8), col = c("green3", "black"), 
        main = "PCA results on standardized data", 
-       xlab = "First component (PC1)", 
-       ylab = "Second component (PC2)") 
+       xlab = "Standardized first component (PC1)", 
+       ylab = "Standardized second component (PC2)") 
 
+
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+# print summary
+summary(pca_human_std)
 ```
 
 <br>
 The new biplot is easier to interpret and the overall variability shows a lot better on a standardized than on a raw data. The extreme value of GNI in Qatar does not have as strong impact on the PC1 in the scaled data. Below is the same plot scaled, so that the country names and clustering can be seen better: 
 ![a biplot of the principal component representation](C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\biplot.jpg)
+<br>
+
+> Upper left: High gender equality and standard of living //
+> Upper right: High gender equality and low standard of living //
+> Lower right: Low gender equality and standard of living //
+> Lower left: Low gender equality and high standard of living 
 
 <br>
 
-The ratio of female/male labour force participation rate (**Labo.FM**) and the percentage of female representatives in parliament (**Parli.F**) seems to have an impact on PC2 and other variables have more impact on PC1, which is in line with previous correlation exploring (**Parli.F** and **Labo.FM** did not have as much correlation with the other variables). The higher the Maternal mortality (**Mat.Mor**) and adolescent birth rate (**Ado.Birth**), the higher the PC1 value. Again, it is also intuitive, that same countries having higher rates of adolescent births are having problems with maternal mortality rate. For example Sierra Leone, Chad and Congo seem to have high rates of both maternal mortality and adolescent births, as well as low life expectancy (years) and expected years of education. The arrow length of all variables is relatively same. The more developed countries, such as Nordic countries can be found in upper left corner in the figure; Iceland, Sweden, Norway, Finland and Denmark have low adolescent birth rate and maternal mortality due to good health care. At the same time, Nordic countries tend to have good education and relatively equal possibilities for females and males to educate themselves and being employed.
+The ratio of female/male labour force participation rate (**Labo.FM**) and the percentage of female representatives in parliament (**Parli.F**) seems to have an impact on PC2 and other variables have more impact on PC1, which is in line with previous correlation exploring (**Parli.F** and **Labo.FM** did not have as much correlation with the other variables). The higher the Maternal mortality (**Mat.Mor**) and adolescent birth rate (**Ado.Birth**), the higher the PC1 value. Again, it is also intuitive, that same countries having higher rates of adolescent births are having problems with maternal mortality rate. For example Sierra Leone, Chad and Congo seem to have high rates of both maternal mortality and adolescent births, as well as low life expectancy (years) and expected years of education. The arrow length of all variables is relatively same. The more developed countries, such as Nordic countries can be found in upper left corner in the figure; Iceland, Sweden, Norway, Finland and Denmark have low adolescent birth rate and maternal mortality due to good health care. At the same time, Nordic countries tend to have good education and relatively equal possibilities for females and males to educate themselves and being employed. 
 
 <br>
 
