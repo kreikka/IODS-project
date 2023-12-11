@@ -1,0 +1,221 @@
+# 6 Analysis of longitudinal data
+
+<br>
+
+
+
+### 6.1. Data Wrangling and loading the data sets
+
+The Data wrangling part with exploring the data can be found [here](https://github.com/kreikka/IODS-project/blob/master/data/meet_and_repeat.R). This weeks data sets 'RATS' and 'BPRS' are longitudinal, including variables with multiple observations in different time points (=multivariate). Clinical trials, especially human health intervention studies are something I'm familiar with, so I was happy with this weeks theme, although I did not have as much time to dive in to the exercises as I would have wanted to. 
+
+<br>
+
+```{r, warning=FALSE, message=FALSE}
+# Access the libraries needed for the Assignment 6:
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lme4)
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+# load the data sets created in the Data wrangling:
+BPRSL <- read_csv(file="C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\data\\bprsl.csv")
+RATSL <- read_csv(file="C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\data\\ratsl.csv")
+RATS <- read_csv(file="C:\\Users\\kuud\\Work Folders\\IODS\\IODS-project\\data\\rats.csv")
+```
+
+<br>
+
+### 6.2. Part 1: The RATS data
+
+<br>
+
+First I'll look at the repeated weight measurement data of rats. 
+
+<br>
+
+When taking a 'glimpse()' of the data, I can see that the **ID** and **Group** need to be turned into factors again.
+
+```{r, warning=FALSE, message=FALSE}
+# Take a glimpse at the RATSL data
+glimpse(RATSL)
+
+# Factor variables ID and Group 
+RATSL$ID <- factor(RATSL$ID)
+RATSL$Group <- factor(RATSL$Group)
+
+# Take a glimpse at the RATSL data
+glimpse(RATSL)
+
+```
+<br>
+
+Next I'll plot the repeated weight measures for all rats by the treatment groups.
+
+```{r, warning=FALSE, message=FALSE}
+# Draw the plot of weight development of each of the rats by groups 
+ggplot(RATSL, aes(x = Time, y = Weight, linetype = ID, col = Group)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ Group, labeller = label_both) +
+  theme(legend.position = "none") + 
+  scale_y_continuous(limits = c(min(RATSL$Weight), max(RATSL$Weight)))
+```
+<br> 
+
+It seems that the weight stays almost the same in the Group 1, whereas both groups 2 and 3 have a trend of weight gain during the study period. The groups have different baseline weights, Group 1 having the lightest rats throughout the study. Group 2 has one rat that is different from the others in the same group. Overall the growth curves appear consistent, general trend being weight gain over time.
+
+The plots above are quite clear, but I'll still look at the weight development with standardized values too. The plot can be used to see how weight at beginning associates with weight changes during the study. The standardized values are obtained by subtracting the mean weight from the original mean and then dividing by the corresponding visit standard deviation.
+
+$$standardised(x) = \frac{x - mean(x)}{ sd(x)}$$
+
+```{r, warning=FALSE, message=FALSE}
+
+# Standardise the variable Weight
+RATSL <- RATSL %>%
+  group_by(Time) %>%
+  mutate(stdweight = (Weight - mean(Weight))/sd(Weight) ) %>%
+  ungroup()
+
+# Draw the plot of weight development of each of the rats by groups 
+ggplot(RATSL, aes(x = Time, y = stdweight, linetype = ID, col = Group)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ Group, labeller = label_both) +
+  theme(legend.position = "none") + 
+  scale_y_continuous(limits = c(min(RATSL$stdweight), max(RATSL$stdweight)))
+
+```
+<br>
+
+The plots seem similar to the one drawn with non-standardized weight values. Next I'll look at the mean weight development by groups during the study.
+
+```{r, warning=FALSE, message=FALSE}
+# Summary data with mean and standard error of bprs by treatment and week 
+RATSS <- RATSL %>%
+  group_by(Group, Time) %>%
+  summarise( mean = mean(Weight), se = sd(Weight)/sqrt(length(Weight)) ) %>%
+  ungroup()
+
+# Plot the mean profiles
+ggplot(RATSS, aes(x = Time, y = mean, linetype = Group, shape = Group, col = Group)) +
+  geom_line() +
+  scale_linetype_manual(values = c(1,2,3)) +
+  geom_point(size=3) +
+  scale_shape_manual(values = c(1,2,3)) +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se, linetype="1"), width=0.3) +
+  scale_y_continuous(name = "mean(weight) +/- se(weight)")
+```
+<br>
+Because the sample size is not that big and the weight development lines are quite linear, we could see the results quite good already from the first plot. Although this comparison plot of the groups is even more clear. Rats in Group 1 are the lighest and the weight development is very moderate during the study period. Groups 2 and 3 have (different but) higher starting weights at baseline, and there is more weight gain during the study. It seems that the weight gain is highest in Group 2.
+
+<br>
+
+In the exercise set I did a box plot for the **BPRS** data, but since the **RATS** data includes only 8 rats in the group 1, and 4 in both of the groups 2 and 3, there is not much sense of doing boxplots. I can already see from the first plot that there is one rat in both groups 1 and 3 that are slightly lighter than others and group 2 has one heavier rat. This is so small dataset that I don't want to remove any "outliers" and all the rats have anyway somewhat similar growth curve (eg. no heavily decreasing weight). 
+
+<br>
+
+Next I'll use T-test to evaluate the statistical differences in mean weights between groups. 
+
+```{r, warning=FALSE, message=FALSE}
+
+# Create a summary data by group and subject with mean as the summary variable (ignoring baseline time point 1)
+RATSLS <- RATSL %>%
+  filter(Time > 1) %>%
+  group_by(Group, ID) %>%
+  summarise( mean=mean(Weight) ) %>%
+  ungroup()
+
+# Box plot
+ggplot(RATSLS, aes(x = Group, y = mean, col=Group)) + geom_boxplot() + stat_summary(fun = "mean", geom = "point", shape=23, size=2.5, fill = "white") + scale_y_continuous(name = "mean(weight), days 8-64")
+
+# Perform a two-sample t-test; group 1 against 2
+t.test(mean ~ Group, data = RATSLS[1:12,], var.equal = TRUE)
+
+# Perform a two-sample t-test; group 2 against 3
+t.test(mean ~ Group, data = RATSLS[9:19,], var.equal = TRUE)
+
+# Perform a two-sample t-test; group 1 against 3
+t.test(mean ~ Group, data = RATSLS[-(9:12),], var.equal = TRUE)
+
+```
+
+<br>
+
+From the T-test results we can see that there is no difference between groups 2 and 3, the t-value being approximately -1.1, p=0.326. There seems to be statistically significant difference when comparing groups 1 and 2; t-value is -9.1, p<0.0001 and when comparing groups 1 and 3; t-value is -27.8, p<0.0001. Next I'll check the between groups differences with analysis of variance (ANOVA) and F-test. 
+
+```{r, warning=FALSE, message=FALSE}
+# Adding the baseline values from the original data as a new variable to the summary data
+RATSLS2 <- RATSLS %>%
+  mutate(baseline = RATS$WD1)
+
+# Fit the linear model with the mean as the response 
+fit <- lm(mean ~ baseline + Group, data = RATSLS2)
+
+# Compute the analysis of variance table for the fitted model with anova()
+anova(fit)
+```
+Baseline weight seems to be a better indicator on the later mean weight than diet group. 
+
+<br>
+
+### 6.3. Part 2: The BPRS data
+
+The data set includes 40 males and their repeated measure of brief psychiatric rating scale (BPRS) in two different treatment groups. Similarly to the **RATS** data, the **subject** and **treatment** variables need to be changed into factors in the **BPRSL** long frame data set. 
+
+```{r, warning=FALSE, message=FALSE}
+# Take a glimpse at the RATSL data
+glimpse(BPRSL)
+
+# Factor variables ID and Group 
+BPRSL$subject <- factor(BPRSL$subject)
+BPRSL$treatment <- factor(BPRSL$treatment)
+
+# Take a glimpse at the BPRSL data again
+glimpse(BPRSL)
+
+# Drawing a plot
+ggplot(BPRSL, aes(x = week, y = bprs, linetype = subject, col = treatment)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ treatment, labeller = label_both) +
+  theme(legend.position = "none") + 
+  scale_y_continuous(limits = c(min(BPRSL$bprs), max(BPRSL$bprs)))
+
+```
+<br>
+
+From the plot above we can see that the general trend in bprs is decreasing in time. Compared to the RATS -data, there seems to be more variance in the repeated measures between weeks within subject. There is some time points that the bprs values are increasing. The baseline bprs-values seem to be similar in both treatment groups (unlike the baseline weights in the RATS data set). There is one subject in the treatment group 2 with baseline bprs-value over 75, which might be an outlier. However, there are a few other subjects getting bprs-value 75 or almost 75 at the second time point. Removing the outliers should always have a clear reasoning behind it, and here I don't see enough evidence to remove the one subject from the following analyses.
+
+Next I'll do linear regression model; explaining the bprs value by study week and treatment group. 
+
+
+```{r, warning=FALSE, message=FALSE}
+# Create a regression model for BPRSL
+BPRSL_reg <- lm(bprs ~ week + treatment, data=BPRSL)
+
+# print out a summary of the model
+summary(BPRSL_reg)
+
+```
+<br>
+
+We can see that the coefficient estimate for weeks in the study is negative and statistically significant, the treatment group is not. This analysis is based on the assumption that each measurement is independent, which is not the case in this data. Next I'll try linear mixed effects model.
+
+```{r, warning=FALSE, message=FALSE}
+# Create a random intercept model
+BPRSL_ref <- lmer(bprs ~ week + treatment + (1 | subject), data = BPRSL, REML = FALSE)
+
+# Print the summary of the model
+summary(BPRSL_ref)
+```
+
+<br>
+
+```{r, warning=FALSE, message=FALSE}
+# Document last knitted:
+date()
+```

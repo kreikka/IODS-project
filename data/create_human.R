@@ -1,5 +1,5 @@
 # Kerttu Uusimäki, 27.11.2023
-# IODS-course, Assignment 4
+# IODS-course, Assignment 4 and 5
 # Data: Human Development Index (HDI); Human development and Gender inequality
 # Data; Human development: https://raw.githubusercontent.com/KimmoVehkalahti/Helsinki-Open-Data-Science/master/datasets/human_development.csv
 # Data; Gender inequality: https://raw.githubusercontent.com/KimmoVehkalahti/Helsinki-Open-Data-Science/master/datasets/gender_inequality.csv

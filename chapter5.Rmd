@@ -225,7 +225,3 @@ fviz_mca_biplot(mca,
 <br>
 It can be seen that the tea shopping place (**where**) and using tea bag or unpacked tea (**how**) are separated from the other variables and are furthest away from the origin (whre x- and y-axis meet). Further we can see from the biplot of individuals and variable categories that unpacked tea and buying tea from a tea shop are next to each other, which is understandable. Similarly, the mixed options of **chain store + shop** and **tea bag + unpacked** are next to each other.
 
-```{r, warning=FALSE, message=FALSE}
-# Document last knitted:
-date()
-```
